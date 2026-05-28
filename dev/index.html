@@ -298,8 +298,8 @@
     }
 
     .topbar {
-      position: relative;
-      top: auto;
+      position: sticky;
+      top: env(safe-area-inset-top, 0px);
       z-index: 50;
       overflow-x: auto;
       margin: 0 calc(clamp(16px, 4vw, 36px) * -1) 24px;
@@ -308,7 +308,11 @@
       backdrop-filter: blur(0px);
       -webkit-backdrop-filter: blur(0px);
       border-bottom: 1px solid transparent;
-      transition: background .35s ease, backdrop-filter .35s ease, border-color .35s ease;
+      transition:
+        background .38s ease,
+        backdrop-filter .38s ease,
+        border-color .38s ease,
+        box-shadow .38s ease;
       scrollbar-width: none;
       -webkit-overflow-scrolling: touch;
     }
@@ -316,13 +320,6 @@
     .topbar::-webkit-scrollbar { display: none; }
 
     .topbar.is-sticky {
-      position: fixed;
-      top: env(safe-area-inset-top, 0px);
-      left: 0;
-      right: 0;
-      margin: 0;
-      padding-left: max(13px, env(safe-area-inset-left, 0px));
-      padding-right: max(13px, env(safe-area-inset-right, 0px));
       background: rgba(15,15,13,.72);
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
@@ -330,9 +327,7 @@
       box-shadow: 0 12px 30px rgba(0,0,0,.18);
     }
 
-    .topbar.is-sticky + .day {
-      margin-top: 96px;
-    }
+    
 
     .tabs {
       display: flex;
@@ -750,6 +745,13 @@
       .shoot { grid-template-columns: 30px 1fr; gap: 10px; }
       .dot { width: 30px; height: 30px; font-size: .85rem; }
       .timeline::before { left: 15px; }
+    }
+
+    
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     @keyframes heroIn {
@@ -1317,14 +1319,43 @@ function setActiveDay() {
     });
     function updateSyncStatus() {
       if (!syncStatus) return;
+      const lastUpdate = localStorage.getItem('lastUpdateLabel') || 'gerade eben';
       syncStatus.textContent = navigator.onLine
-        ? 'Online · manuell neu laden für aktuelle Version'
-        : 'Offline · vorhandene Version bleibt verfügbar';
+        ? 'Online · zuletzt aktualisiert ' + lastUpdate
+        : 'Offline · Stand: ' + lastUpdate;
     }
 
-    updateSyncStatus();
+    function setLastUpdatedNow() {
+      const label = new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+      localStorage.setItem('lastUpdateLabel', label + ' Uhr');
+      updateSyncStatus();
+    }
+
+    setLastUpdatedNow();
     window.addEventListener('online', updateSyncStatus);
     window.addEventListener('offline', updateSyncStatus);
+
+    const AUTO_REFRESH_MINUTES = 10;
+    let lastRefreshAttempt = Date.now();
+
+    function autoRefreshIfUseful() {
+      updateSyncStatus();
+
+      const elapsed = Date.now() - lastRefreshAttempt;
+      if (elapsed < AUTO_REFRESH_MINUTES * 60 * 1000) return;
+      lastRefreshAttempt = Date.now();
+
+      const weatherOpen = weatherModal?.classList.contains('open');
+      if (navigator.onLine && !document.hidden && !weatherOpen) {
+        localStorage.setItem('lastUpdateLabel', new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) + ' Uhr');
+        window.location.reload();
+      }
+    }
+
+    setInterval(autoRefreshIfUseful, 60 * 1000);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) autoRefreshIfUseful();
+    });
   </script>
 </body>
 </html>
