@@ -1,1 +1,921 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#101010" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Dolomiten Shooting" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="manifest.json" />
+  <title>Dolomiten Shooting</title>
+  <style>
+    :root {
+      --bg: #0f0f0d;
+      --card: rgba(255,255,255,.08);
+      --card-strong: rgba(255,255,255,.12);
+      --text: #f7f1e8;
+      --muted: rgba(247,241,232,.68);
+      --line: rgba(247,241,232,.18);
+      --accent: #d8b16a;
+      --accent2: #8fb5a1;
+      --radius: 28px;
+      --shadow: 0 18px 55px rgba(0,0,0,.35);
+    }
 
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      z-index: 999;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      transform-origin: left;
+      transform: scaleX(var(--scroll-progress, 0));
+      box-shadow: 0 0 18px rgba(216,177,106,.45);
+    }
+
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 20% 0%, rgba(216,177,106,.20), transparent 34%),
+        radial-gradient(circle at 90% 10%, rgba(143,181,161,.16), transparent 28%),
+        linear-gradient(180deg, #151411 0%, var(--bg) 38%, #090907 100%);
+      color: var(--text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .app {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+      padding: 0 clamp(16px, 4vw, 36px) 56px;
+    }
+
+    .hero {
+      --hero-shift: 0px;
+      min-height: clamp(320px, 42vh, 460px);
+      animation: heroIn .9s ease-out both;
+      display: grid;
+      align-items: end;
+      padding: max(44px, env(safe-area-inset-top)) clamp(16px, 4vw, 36px) 28px;
+      margin: 0 calc(clamp(16px, 4vw, 36px) * -1) 18px;
+      overflow: hidden;
+      position: relative;
+      background:
+        linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,.62)),
+        url('https://mountainmoments.de/wp-content/uploads/2021/06/mountainmoments-95.jpg');
+      background-size: cover;
+      background-position: center calc(50% + var(--hero-shift));
+      background-attachment: scroll;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 20% 18%, rgba(216,177,106,.16), transparent 34%),
+        linear-gradient(180deg, rgba(0,0,0,.12), rgba(0,0,0,.10));
+      pointer-events: none;
+    }
+
+    .hero > div {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      --hero-align: -6px;
+    }
+
+    .eyebrow {
+      color: var(--accent);
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      font-size: .75rem;
+      font-weight: 700;
+      margin: 0 0 12px;
+      width: fit-content;
+      transform: translateX(0px);
+      padding-left: 6px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(3rem, 13vw, 7.4rem);
+      line-height: .86;
+      letter-spacing: -.08em;
+      max-width: 980px;
+      transform: translateX(var(--hero-align));
+    }
+
+    .hero p {
+      color: rgba(247,241,232,.82);
+      font-size: clamp(1rem, 3.2vw, 1.2rem);
+      line-height: 1.55;
+      max-width: 940px;
+      margin: 16px 0 0;
+      transform: translateX(0px);
+      padding-left: 6px;
+    }
+
+    .next-panel {
+      margin-top: 18px;
+      width: min(520px, 100%);
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.24);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-radius: 22px;
+      padding: 14px 15px;
+      box-shadow: 0 16px 42px rgba(0,0,0,.22);
+    }
+
+    .next-label {
+      color: var(--accent);
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      font-size: .68rem;
+      font-weight: 900;
+      margin-bottom: 7px;
+    }
+
+    .next-title {
+      font-size: clamp(1.05rem, 4vw, 1.35rem);
+      font-weight: 900;
+      letter-spacing: -.03em;
+      line-height: 1.1;
+    }
+
+    .next-meta {
+      margin-top: 7px;
+      color: rgba(247,241,232,.72);
+      font-size: .92rem;
+      line-height: 1.35;
+    }
+
+    .next-countdown {
+      margin-top: 10px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .count-pill {
+      min-width: 66px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.07);
+      border-radius: 16px;
+      padding: 9px 10px;
+      text-align: center;
+    }
+
+    .count-pill strong {
+      display: block;
+      font-size: 1.18rem;
+      line-height: 1;
+    }
+
+    .count-pill span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: .68rem;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      font-weight: 800;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      overflow-x: auto;
+      margin: 0 calc(clamp(16px, 4vw, 36px) * -1) 24px;
+      padding: 10px clamp(16px, 4vw, 36px);
+      background: transparent;
+      backdrop-filter: blur(0px);
+      -webkit-backdrop-filter: blur(0px);
+      border-bottom: 1px solid transparent;
+      transition: background .35s ease, backdrop-filter .35s ease, border-color .35s ease;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .topbar::-webkit-scrollbar { display: none; }
+
+    .topbar.is-sticky {
+      background: rgba(15,15,13,.72);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-bottom-color: rgba(247,241,232,.08);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      min-width: max-content;
+    }
+
+    .tab {
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.05);
+      color: var(--muted);
+      font-size: .95rem;
+      white-space: nowrap;
+      transition: transform .25s ease, background .25s ease, color .25s ease, border-color .25s ease;
+    }
+
+    .tab strong { color: var(--text); }
+
+    .tab:hover,
+    .tab.active {
+      transform: translateY(-1px);
+      color: var(--text);
+      border-color: rgba(216,177,106,.45);
+      background: rgba(216,177,106,.12);
+    }
+
+    .day {
+      margin: 42px 0 70px;
+      scroll-margin-top: 96px;
+    }
+
+    .day-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 16px;
+    }
+
+    .day-title {
+      margin: 0;
+      font-size: clamp(2rem, 8vw, 4.8rem);
+      letter-spacing: -.06em;
+      line-height: .9;
+    }
+
+    .day-meta {
+      color: var(--muted);
+      text-align: right;
+      font-size: .94rem;
+      min-width: 110px;
+    }
+
+    .timeline {
+      position: relative;
+      display: grid;
+      gap: 18px;
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 18px;
+      top: 18px;
+      bottom: 18px;
+      width: 1px;
+      background: linear-gradient(var(--accent), var(--line));
+      opacity: .65;
+    }
+
+    .shoot {
+      position: relative;
+      opacity: 0;
+      transform: translateY(26px) scale(.985);
+      transition: opacity .75s ease, transform .75s ease;
+      display: grid;
+      grid-template-columns: 38px 1fr;
+      gap: 14px;
+    }
+
+    .shoot.is-visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .dot {
+      width: 37px;
+      height: 37px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      color: #1b1710;
+      background: linear-gradient(135deg, #f0d596, var(--accent));
+      font-weight: 900;
+      box-shadow: 0 0 0 7px rgba(216,177,106,.10), 0 10px 28px rgba(216,177,106,.16);
+      transition: transform .45s ease, box-shadow .45s ease;
+      z-index: 2;
+      margin-top: 22px;
+    }
+
+    .shoot.is-visible:hover .dot {
+      transform: scale(1.06);
+      box-shadow: 0 0 0 9px rgba(216,177,106,.12), 0 14px 36px rgba(216,177,106,.22);
+    }
+
+    .card {
+      overflow: hidden;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, var(--card-strong), var(--card));
+      box-shadow: var(--shadow);
+      transform: translateZ(0);
+      transition: transform .45s ease, border-color .45s ease, box-shadow .45s ease;
+    }
+
+    .shoot.is-visible .card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(216,177,106,.35);
+      box-shadow: 0 24px 70px rgba(0,0,0,.42);
+    }
+
+    .visual {
+      min-height: clamp(220px, 48vw, 340px);
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.68)),
+        var(--image, linear-gradient(135deg, rgba(216,177,106,.32), rgba(143,181,161,.20)));
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      align-items: flex-end;
+      padding: 18px;
+      position: relative;
+    }
+
+    .visual::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: inherit;
+      background-size: cover;
+      background-position: center;
+      transform: scale(1.015);
+      z-index: 0;
+    }
+
+    .visual::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at 50% 18%, transparent 0 34%, rgba(0,0,0,.18) 72%);
+      z-index: 1;
+    }
+
+    .badge-row {
+      position: relative;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    .badge {
+      pointer-events: none;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(0,0,0,.26);
+      backdrop-filter: blur(14px);
+      color: #fff;
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: .86rem;
+      box-shadow: 0 10px 24px rgba(0,0,0,.16);
+    }
+
+    .content { padding: 18px; }
+
+    .title-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: flex-start;
+      margin-bottom: 14px;
+    }
+
+    h3 {
+      margin: 0;
+      font-size: clamp(1.35rem, 5vw, 2.1rem);
+      letter-spacing: -.04em;
+      line-height: 1.02;
+    }
+
+    .weather-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.10);
+      color: rgba(247,241,232,.9);
+      font-size: .84rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .info {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.045);
+      border-radius: 18px;
+      padding: 12px;
+      min-height: 74px;
+    }
+
+    .label {
+      display: block;
+      color: var(--muted);
+      font-size: .76rem;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      margin-bottom: 6px;
+      font-weight: 800;
+    }
+
+    .value {
+      font-size: .98rem;
+      line-height: 1.25;
+      word-break: break-word;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .actions.single { grid-template-columns: 1fr; }
+
+    .btn {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 48px;
+      border-radius: 16px;
+      font-weight: 900;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.07);
+      transition: transform .24s ease, background .24s ease, border-color .24s ease, box-shadow .24s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      background: rgba(255,255,255,.105);
+      border-color: rgba(216,177,106,.34);
+    }
+
+    .btn:active { transform: translateY(0) scale(.985); }
+
+    .btn.primary {
+      background: linear-gradient(135deg, #f0d596, var(--accent));
+      color: #17130c;
+      border: 0;
+      box-shadow: 0 12px 28px rgba(216,177,106,.18);
+    }
+
+    .route-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: -2px 0 4px 52px;
+      color: var(--muted);
+      font-size: .92rem;
+      opacity: .82;
+    }
+
+    @media (min-width: 760px) {
+      .timeline { gap: 24px; }
+      .card { display: grid; grid-template-columns: minmax(280px, 42%) 1fr; }
+      .visual { min-height: 100%; }
+      .content { padding: 24px; }
+      .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .shoot { grid-template-columns: 46px 1fr; }
+      .dot { width: 44px; height: 44px; margin-top: 26px; }
+      .timeline::before { left: 22px; }
+    }
+
+    @media (max-width: 430px) {
+      .hero {
+        background-position: 58% center;
+      }
+
+      .app { padding-left: 13px; padding-right: 13px; }
+      .hero { min-height: 340px; margin-left: -13px; margin-right: -13px; padding-left: 18px; padding-right: 18px; }
+      .grid, .actions { grid-template-columns: 1fr; }
+      .day-head { align-items: flex-start; flex-direction: column; }
+      .day-meta { text-align: left; }
+      .shoot { grid-template-columns: 30px 1fr; gap: 10px; }
+      .dot { width: 30px; height: 30px; font-size: .85rem; }
+      .timeline::before { left: 15px; }
+    }
+
+    @keyframes heroIn {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation-duration: .001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .001ms !important;
+        scroll-behavior: auto !important;
+      }
+      .shoot { opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="hero">
+      <div>
+        <div class="eyebrow">13 Stories Photography · Zeitplan</div>
+        <h1>Dolomiten Shooting</h1>
+        <p>Val di Funes · Seiser Alm · Langental · Grödner Joch · Lago Pian Da Mur · Passo Pordoi</p>
+        <div class="next-panel" id="nextPanel" hidden>
+          <div class="next-label">Nächster Termin</div>
+          <div class="next-title" id="nextTitle">Dolomiten Shooting</div>
+          <div class="next-meta" id="nextMeta">Zeitplan wird geladen…</div>
+          <div class="next-countdown" aria-label="Countdown">
+            <div class="count-pill"><strong id="countDays">0</strong><span>Tage</span></div>
+            <div class="count-pill"><strong id="countHours">0</strong><span>Std</span></div>
+            <div class="count-pill"><strong id="countMinutes">0</strong><span>Min</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <nav class="topbar" aria-label="Tagesnavigation">
+      <div class="tabs">
+        <a class="tab" href="#fr"><strong>Fr</strong> 29.05.</a>
+        <a class="tab" href="#sa"><strong>Sa</strong> 30.05.</a>
+        <a class="tab" href="#so"><strong>So</strong> 31.05.</a>
+      </div>
+    </nav>
+
+    <section class="day" id="fr">
+      <div class="day-head">
+        <h2 class="day-title">Freitag</h2>
+        <div class="day-meta">29.05.2026</div>
+      </div>
+
+      <div class="timeline">
+        <article class="shoot">
+          <div class="dot">1</div>
+          <div class="card">
+            <div class="visual" style="--image: url('https://www.montagnaestate.it/wp-content/uploads/val-di-funes-al-tramonto-in-estate-890x593.jpg');"></div>
+            <div class="content">
+              <div class="title-row">
+                <div><h3>Shooting „Val di Funes“</h3></div>
+                <span class="weather-pill">🌤️ 14°</span>
+              </div>
+              <div class="grid">
+                <div class="info"><span class="label">Treffzeit</span><span class="value">TBA</span></div>
+                <div class="info"><span class="label">Treffpunkt</span><span class="value">TBA</span></div>
+                <div class="info"><span class="label">Shooting</span><span class="value">TBA</span></div>
+                <div class="info"><span class="label">Location</span><span class="value">Val di Funes</span></div>
+              </div>
+              <div class="actions single">
+                <a class="btn primary" href="https://maps.app.goo.gl/CzT5NBFWz6P5zAxU6" target="_blank" rel="noopener">Location öffnen</a>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="day" id="sa">
+      <div class="day-head">
+        <h2 class="day-title">Samstag</h2>
+        <div class="day-meta">30.05.2026</div>
+      </div>
+
+      <div class="timeline">
+        <article class="shoot">
+          <div class="dot">1</div>
+          <div class="card">
+            <div class="visual" style="--image: url('https://mountainmoments.de/wp-content/uploads/2021/06/mountainmoments-95.jpg');">
+              <div class="badge-row">
+                <span class="badge">Goldene Stunde</span>
+                <span class="badge">Picknick</span>
+                <span class="badge">Sonnenaufgang</span>
+              </div>
+            </div>
+            <div class="content">
+              <div class="title-row">
+                <div>
+                  <h3>Shooting #1 · Seiser-Alm-Panorama</h3>
+                  <div style="color: var(--muted); margin-top: 8px; font-size: .98rem;">🧺 Picknick im Sonnenaufgang</div>
+                </div>
+                <span class="weather-pill">🌅 9°</span>
+              </div>
+              <div class="grid">
+                <div class="info"><span class="label">Treffzeit</span><span class="value">06:00 Uhr</span></div>
+                <div class="info"><span class="label">Treffpunkt</span><span class="value">Parkplatz P4</span></div>
+                <div class="info"><span class="label">Shooting</span><span class="value">06:30–09:00 Uhr</span></div>
+                <div class="info"><span class="label">Location</span><span class="value">Seiser-Alm-Panorama</span></div>
+              </div>
+              <div class="actions">
+                <a class="btn" href="https://maps.app.goo.gl/eznsJcteWourmMaMA" target="_blank" rel="noopener">Treffpunkt öffnen</a>
+                <a class="btn primary" href="https://maps.app.goo.gl/3ENp89cx95QsnvAH6" target="_blank" rel="noopener">Location öffnen</a>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <div class="route-info">🚐 ca. 55 Min. Fahrt</div>
+
+        <article class="shoot">
+          <div class="dot">2</div>
+          <div class="card">
+            <div class="visual" style="--image: url('https://www.val-gardena.com/fileadmin/_processed_/0/9/csm_pra-da-ri-langental-02_de2ca4ac91.jpg');">
+              <div class="badge-row">
+                <span class="badge">Farben</span>
+                <span class="badge">Paar-Momente</span>
+                <span class="badge">Kreativ</span>
+              </div>
+            </div>
+            <div class="content">
+              <div class="title-row">
+                <div>
+                  <h3>Shooting #2 · Langental</h3>
+                  <div style="color: var(--muted); margin-top: 8px; font-size: .98rem;">🎨 Mal-Date</div>
+                </div>
+                <span class="weather-pill">☀️ 16°</span>
+              </div>
+              <div class="grid">
+                <div class="info"><span class="label">Treffzeit</span><span class="value">12:00 Uhr</span></div>
+                <div class="info"><span class="label">Treffpunkt</span><span class="value">Parkplatz Langental · Wolkenstein</span></div>
+                <div class="info"><span class="label">Shooting</span><span class="value">12:30–14:00 Uhr</span></div>
+                <div class="info"><span class="label">Location</span><span class="value">Langental</span></div>
+              </div>
+              <div class="actions">
+                <a class="btn" href="https://maps.app.goo.gl/k7StsRfcmxkkbfXD7" target="_blank" rel="noopener">Treffpunkt öffnen</a>
+                <a class="btn primary" href="https://maps.app.goo.gl/8UWEin99q7AnNsZc6" target="_blank" rel="noopener">Location öffnen</a>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="day" id="so">
+      <div class="day-head">
+        <h2 class="day-title">Sonntag</h2>
+        <div class="day-meta">31.05.2026</div>
+      </div>
+
+      <div class="timeline">
+        <article class="shoot">
+          <div class="dot">1</div>
+          <div class="card">
+            <div class="visual" style="--image: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1800&q=80');">
+              <div class="badge-row">
+                <span class="badge">Aussicht</span>
+                <span class="badge">Gitarre</span>
+                <span class="badge">Goldenes Licht</span>
+              </div>
+            </div>
+            <div class="content">
+              <div class="title-row">
+                <div>
+                  <h3>Shooting #1 · Grödner Joch</h3>
+                  <div style="color: var(--muted); margin-top: 8px; font-size: .98rem;">🎸 Ausblick genießen & Gitarre spielen</div>
+                </div>
+                <span class="weather-pill">🌅 9°</span>
+              </div>
+              <div class="grid">
+                <div class="info"><span class="label">Treffzeit</span><span class="value">06:30 Uhr</span></div>
+                <div class="info"><span class="label">Treffpunkt</span><span class="value">Ju de Frara</span></div>
+                <div class="info"><span class="label">Shooting</span><span class="value">07:00 Uhr–TBA</span></div>
+                <div class="info"><span class="label">Location</span><span class="value">Grödner Joch</span></div>
+              </div>
+              <div class="actions">
+                <a class="btn" href="https://maps.app.goo.gl/T6siJyU9Zwms5qhR6" target="_blank" rel="noopener">Treffpunkt öffnen</a>
+                <a class="btn primary" href="https://maps.app.goo.gl/ZbhahRyeLKDFfKU28" target="_blank" rel="noopener">Location öffnen</a>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <div class="route-info">🚐 ca. 35 Min. Fahrt</div>
+
+        <article class="shoot">
+          <div class="dot">2</div>
+          <div class="card">
+            <div class="visual" style="--image: url('https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1800&q=80');">
+              <div class="badge-row">
+                <span class="badge">Spaziergang</span>
+                <span class="badge">Ruhe</span>
+              </div>
+            </div>
+            <div class="content">
+              <div class="title-row">
+                <div>
+                  <h3>Shooting #2 · Lago Pian Da Mur</h3>
+                  <div style="color: var(--muted); margin-top: 8px; font-size: .98rem;">🚶 Schöner Spaziergang</div>
+                </div>
+                <span class="weather-pill">🌤️ 14°</span>
+              </div>
+              <div class="grid">
+                <div class="info"><span class="label">Treffzeit</span><span class="value">10:00 Uhr</span></div>
+                <div class="info"><span class="label">Treffpunkt</span><span class="value">Hotel Garni Gonzaga</span></div>
+                <div class="info"><span class="label">Shooting</span><span class="value">10:30 Uhr–TBA</span></div>
+                <div class="info"><span class="label">Location</span><span class="value">Lago Pian Da Mur</span></div>
+              </div>
+              <div class="actions">
+                <a class="btn" href="https://maps.app.goo.gl/XnG5DgzQ9LjgZaTCA" target="_blank" rel="noopener">Treffpunkt öffnen</a>
+                <a class="btn primary" href="https://maps.app.goo.gl/a29SA2koVQ9Af7fz8" target="_blank" rel="noopener">Location öffnen</a>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <div class="route-info">🚐 ca. 40 Min. Fahrt</div>
+
+        <article class="shoot">
+          <div class="dot">3</div>
+          <div class="card">
+            <div class="visual" style="--image: url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1800&q=80');">
+              <div class="badge-row">
+                <span class="badge">Portraits</span>
+                <span class="badge">Perspektiven</span>
+                <span class="badge">Gemeinsame Bilder</span>
+              </div>
+            </div>
+            <div class="content">
+              <div class="title-row">
+                <div>
+                  <h3>Shooting #3 · Passo Pordoi</h3>
+                  <div style="color: var(--muted); margin-top: 8px; font-size: .98rem;">📷 Gegenseitig fotografieren</div>
+                </div>
+                <span class="weather-pill">☀️ 16°</span>
+              </div>
+              <div class="grid">
+                <div class="info"><span class="label">Treffzeit</span><span class="value">12:45 Uhr</span></div>
+                <div class="info"><span class="label">Treffpunkt</span><span class="value">Passo Pordoi</span></div>
+                <div class="info"><span class="label">Shooting</span><span class="value">13:00 Uhr–TBA</span></div>
+                <div class="info"><span class="label">Location</span><span class="value">Passo Pordoi</span></div>
+              </div>
+              <div class="actions single">
+                <a class="btn primary" href="https://maps.app.goo.gl/dMj9SZhtKN7uaKKY9" target="_blank" rel="noopener">Location öffnen</a>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const root = document.documentElement;
+    const shots = document.querySelectorAll('.shoot');
+    const sections = document.querySelectorAll('.day');
+    const tabs = document.querySelectorAll('.tab');
+    const hero = document.querySelector('.hero');
+    const topbar = document.querySelector('.topbar');
+    const nextPanel = document.getElementById('nextPanel');
+    const nextTitle = document.getElementById('nextTitle');
+    const nextMeta = document.getElementById('nextMeta');
+    const countDays = document.getElementById('countDays');
+    const countHours = document.getElementById('countHours');
+    const countMinutes = document.getElementById('countMinutes');
+
+    const scheduleItems = [
+      { title: 'Val di Funes', timeLabel: 'Zeit offen', meeting: null, spot: 'Val di Funes' },
+      { title: 'Seiser-Alm-Panorama', timeLabel: '06:00 Treffpunkt · 06:30 Shooting', meeting: '2026-05-30T06:00:00', spot: 'Parkplatz P4' },
+      { title: 'Langental', timeLabel: '12:00 Treffpunkt · 12:30 Shooting', meeting: '2026-05-30T12:00:00', spot: 'Parkplatz Langental' },
+      { title: 'Grödner Joch', timeLabel: '06:30 Treffpunkt · 07:00 Shooting', meeting: '2026-05-31T06:30:00', spot: 'Ju de Frara' },
+      { title: 'Lago Pian Da Mur', timeLabel: '10:00 Treffpunkt · 10:30 Shooting', meeting: '2026-05-31T10:00:00', spot: 'Hotel Garni Gonzaga' },
+      { title: 'Passo Pordoi', timeLabel: '12:45 Treffpunkt · 13:00 Shooting', meeting: '2026-05-31T12:45:00', spot: 'Passo Pordoi' }
+    ];
+
+    function updateCountdown() {
+      if (!nextPanel) return;
+      const now = new Date();
+      const nextItem = scheduleItems
+        .filter(item => item.meeting)
+        .map(item => ({ ...item, date: new Date(item.meeting) }))
+        .find(item => item.date > now);
+
+      if (!nextItem) {
+        nextPanel.hidden = false;
+        nextTitle.textContent = 'Shooting abgeschlossen';
+        nextMeta.textContent = 'Alle geplanten Termine liegen hinter euch.';
+        countDays.textContent = '0';
+        countHours.textContent = '0';
+        countMinutes.textContent = '0';
+        return;
+      }
+
+      const diff = nextItem.date - now;
+      const days = Math.floor(diff / 86400000);
+      const hours = Math.floor((diff % 86400000) / 3600000);
+      const minutes = Math.floor((diff % 3600000) / 60000);
+
+      nextPanel.hidden = false;
+      nextTitle.textContent = nextItem.title;
+      nextMeta.textContent = nextItem.timeLabel + ' · ' + nextItem.spot;
+      countDays.textContent = days;
+      countHours.textContent = hours;
+      countMinutes.textContent = minutes;
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 30000);
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      });
+    }
+
+    function setActiveDay() {
+      if (!sections.length || !tabs.length) return;
+      const marker = Math.min(window.innerHeight * 0.38, 260);
+      let activeSection = sections[0];
+
+      sections.forEach((section) => {
+        const rect = section.getBoundingClientRect();
+        if (rect.top <= marker) activeSection = section;
+      });
+
+      tabs.forEach((tab) => {
+        tab.classList.toggle('active', tab.getAttribute('href') === '#' + activeSection.id);
+      });
+    }
+
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.16 });
+
+    shots.forEach((shot, index) => {
+      shot.style.transitionDelay = `${Math.min(index * 70, 280)}ms`;
+      revealObserver.observe(shot);
+    });
+
+    function updateScrollProgress() {
+      if (hero) {
+        const heroOffset = Math.min(window.scrollY * 0.12, 26);
+        hero.style.setProperty('--hero-shift', heroOffset + 'px');
+      }
+      const max = document.body.scrollHeight - window.innerHeight;
+      const progress = max > 0 ? window.scrollY / max : 0;
+      root.style.setProperty('--scroll-progress', progress.toFixed(4));
+    }
+
+    function updateStickyState() {
+      if (!topbar || !hero) return;
+      const trigger = hero.offsetHeight - 80;
+      topbar.classList.toggle('is-sticky', window.scrollY > trigger);
+    }
+
+    function onScroll() {
+      setActiveDay();
+      updateScrollProgress();
+      updateStickyState();
+    }
+
+    setActiveDay();
+    updateScrollProgress();
+    updateStickyState();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+  </script>
+</body>
+</html>
