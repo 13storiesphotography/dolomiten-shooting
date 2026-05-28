@@ -298,8 +298,8 @@
     }
 
     .topbar {
-      position: sticky;
-      top: env(safe-area-inset-top, 0px);
+      position: relative;
+      top: auto;
       z-index: 50;
       overflow-x: auto;
       margin: 0 calc(clamp(16px, 4vw, 36px) * -1) 24px;
@@ -320,11 +320,28 @@
     .topbar::-webkit-scrollbar { display: none; }
 
     .topbar.is-sticky {
+      position: fixed;
+      top: env(safe-area-inset-top, 0px);
+      left: 0;
+      right: 0;
+      margin: 0;
+      padding-left: max(clamp(16px, 4vw, 36px), calc((100vw - 1120px) / 2 + 36px));
+      padding-right: max(clamp(16px, 4vw, 36px), calc((100vw - 1120px) / 2 + 36px));
       background: rgba(15,15,13,.72);
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
       border-bottom-color: rgba(247,241,232,.08);
       box-shadow: 0 12px 30px rgba(0,0,0,.18);
+    }
+
+    .topbar-spacer {
+      display: none;
+      height: 0;
+      margin: 0 0 24px;
+    }
+
+    .topbar-spacer.active {
+      display: block;
     }
 
     
@@ -747,13 +764,6 @@
       .timeline::before { left: 15px; }
     }
 
-    
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
     @keyframes heroIn {
       from { opacity: 0; transform: translateY(18px); }
       to { opacity: 1; transform: translateY(0); }
@@ -803,6 +813,7 @@
         <a class="tab" href="#so"><strong>So</strong> 31.05.</a>
       </div>
     </nav>
+    <div class="topbar-spacer" aria-hidden="true"></div>
 
     <section class="day" id="fr">
       <div class="day-head">
@@ -1045,6 +1056,7 @@
     const tabs = document.querySelectorAll('.tab');
     const hero = document.querySelector('.hero');
     const topbar = document.querySelector('.topbar');
+    const topbarSpacer = document.querySelector('.topbar-spacer');
     const nextPanel = document.getElementById('nextPanel');
     const nextTitle = document.getElementById('nextTitle');
     const nextMeta = document.getElementById('nextMeta');
@@ -1224,7 +1236,13 @@ function setActiveDay() {
     function updateStickyState() {
       if (!topbar || !hero) return;
       const trigger = hero.offsetHeight - 80;
-      topbar.classList.toggle('is-sticky', window.scrollY > trigger);
+      const shouldStick = window.scrollY > trigger;
+      topbar.classList.toggle('is-sticky', shouldStick);
+
+      if (topbarSpacer) {
+        topbarSpacer.classList.toggle('active', shouldStick);
+        topbarSpacer.style.height = shouldStick ? topbar.offsetHeight + 'px' : '0px';
+      }
     }
 
     function onScroll() {
