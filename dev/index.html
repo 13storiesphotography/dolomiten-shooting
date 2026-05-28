@@ -84,6 +84,10 @@
     .hero > div {
       position: relative;
       z-index: 1;
+      width: 100%;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0;
     }
 
     .eyebrow {
@@ -92,7 +96,8 @@
       text-transform: uppercase;
       font-size: .75rem;
       font-weight: 700;
-      margin-bottom: 16px;
+      margin: 0 0 12px;
+      padding-left: 2px;
     }
 
     h1 {
@@ -108,7 +113,8 @@
       font-size: clamp(1rem, 3.2vw, 1.2rem);
       line-height: 1.55;
       max-width: 940px;
-      margin: 22px 0 0;
+      margin: 16px 0 0;
+      padding-left: 2px;
     }
 
     .topbar {
@@ -145,105 +151,9 @@
       background: rgba(216,177,106,.10);
     }
 
-.notice {
-  border: 1px solid rgba(216,177,106,.22);
-  background: linear-gradient(
-    135deg,
-    rgba(216,177,106,.10),
-    rgba(255,255,255,.035)
-  );
-  border-radius: 20px;
-  padding: 0;
-  color: rgba(247,241,232,.82);
-  margin: 0 0 28px;
-  line-height: 1.45;
-  font-size: .95rem;
-  overflow: hidden;
-}
-      border: 1px solid rgba(216,177,106,.22);
-      background: linear-gradient(135deg, rgba(216,177,106,.10), rgba(255,255,255,.035));
-      border-radius: 20px;
-      padding: 0;
-      color: rgba(247,241,232,.82);
-      margin: 0 0 28px;
-      line-height: 1.45;
-      font-size: .95rem;
-      overflow: hidden;
-    }
+    
 
-    .traffic-box {
-      display: grid;
-      gap: 10px;
-      padding: 14px 16px;
-    }
-
-    .traffic-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      color: var(--accent);
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      font-size: .72rem;
-      font-weight: 900;
-    }
-
-    .traffic-status {
-      color: var(--muted);
-      letter-spacing: 0;
-      text-transform: none;
-      font-size: .78rem;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-
-    .traffic-ticker {
-      position: relative;
-      overflow: hidden;
-      min-height: 28px;
-      mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
-      -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
-    }
-
-    .traffic-track {
-      display: inline-flex;
-      gap: 28px;
-      min-width: max-content;
-      white-space: nowrap;
-      animation: tickerMove 42s linear infinite;
-      will-change: transform;
-    }
-
-    .traffic-ticker:hover .traffic-track {
-      animation-play-state: paused;
-    }
-
-    .traffic-item {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      color: rgba(247,241,232,.88);
-    }
-
-    .traffic-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      background: var(--accent);
-      box-shadow: 0 0 14px rgba(216,177,106,.55);
-      flex: 0 0 auto;
-    }
-
-    .traffic-fallback {
-      color: var(--muted);
-      font-size: .9rem;
-    }
-
-    @keyframes tickerMove {
-      from { transform: translateX(0); }
-      to { transform: translateX(-50%); }
-    }
+    
 
     .day {
       margin: 42px 0 70px;
@@ -423,15 +333,20 @@
     }
 
     .time-pill {
-      flex: 0 0 auto;
-      color: #1b1710;
-      background: linear-gradient(135deg, #f0d596, var(--accent));
+      display: none;
+    }
+
+    .weather-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 10px;
       border-radius: 999px;
-      padding: 8px 11px;
-      font-size: .8rem;
-      font-weight: 900;
-      letter-spacing: .03em;
-      box-shadow: 0 10px 24px rgba(216,177,106,.14);
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.11);
+      color: rgba(247,241,232,.86);
+      font-size: .84rem;
+      font-weight: 700;
       white-space: nowrap;
     }
 
@@ -602,20 +517,6 @@
       </div>
     </nav>
 
-    <div class="notice" aria-live="polite">
-      <div class="traffic-box">
-        <div class="traffic-head">
-          <span>Aktuelle Verkehrslage</span>
-          <span class="traffic-status" id="trafficStatus">lädt…</span>
-        </div>
-        <div class="traffic-ticker">
-          <div class="traffic-track" id="trafficTrack">
-            <span class="traffic-fallback">Verkehrsmeldungen werden geladen…</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <section class="day" id="fr">
       <div class="day-head">
         <h2 class="day-title">Freitag</h2>
@@ -635,8 +536,8 @@
             <div class="content">
               <div class="title-row">
                 <h3>Shooting „Val di Funes“</h3>
-                <span class="time-pill">Zeit offen</span>
-              </div>
+                <span class="weather-pill">🌤️ Wechselhaft · 14°C</span>
+                </div>
               <div class="grid">
                 <div class="info"><span class="label">Shooting</span><span class="value">TBA</span></div>
                 <div class="info"><span class="label">Treffpunkt</span><span class="value">TBA</span></div>
@@ -675,8 +576,8 @@
                   <h3>Shooting #1 · Seiser-Alm-Panorama</h3>
                   <div style="color: var(--muted); margin-top: 8px; font-size: .98rem;">🧺 Picknick im Sonnenaufgang</div>
                 </div>
-                <span class="time-pill">06:00</span>
-              </div>
+                <span class="weather-pill">🌅 Klar · 9°C</span>
+                </div>
               <div class="grid">
                 <div class="info"><span class="label">Shooting</span><span class="value">06:30–09:00 Uhr</span></div>
                 <div class="info"><span class="label">Dauer</span><span class="value">ca. 2 Std.</span></div>
@@ -706,8 +607,8 @@
                   <h3>Shooting #2 · Langental</h3>
                   <div style="color: var(--muted); margin-top: 8px; font-size: .98rem;">🎨 Mal-Date</div>
                 </div>
-                <span class="time-pill">12:00</span>
-              </div>
+                <span class="weather-pill">☀️ Sonnig · 16°C</span>
+                </div>
               <div class="grid">
                 <div class="info"><span class="label">Shooting</span><span class="value">12:30–14:00 Uhr</span></div>
                 <div class="info"><span class="label">Dauer</span><span class="value">ca. 1 Std.</span></div>
@@ -746,8 +647,8 @@
                   <h3>Shooting #1 · Grödner Joch</h3>
                   <div style="color: var(--muted); margin-top: 8px; font-size: .98rem;">🎸 Ausblick genießen & Gitarre spielen</div>
                 </div>
-                <span class="time-pill">06:30</span>
-              </div>
+                <span class="weather-pill">🌅 Klar · 9°C</span>
+                </div>
               <div class="grid">
                 <div class="info"><span class="label">Shooting</span><span class="value">07:00 Uhr–TBA</span></div>
                 <div class="info"><span class="label">Treffpunkt</span><span class="value">Grödner Joch Aussicht · Ju de Frara</span></div>
@@ -777,8 +678,8 @@
                   <h3>Shooting #2 · Lago Pian Da Mur</h3>
                   <div style="color: var(--muted); margin-top: 8px; font-size: .98rem;">🚶 Schöner Spaziergang</div>
                 </div>
-                <span class="time-pill">10:00</span>
-              </div>
+                <span class="weather-pill">🌤️ Wolkig · 14°C</span>
+                </div>
               <div class="grid">
                 <div class="info"><span class="label">Shooting</span><span class="value">10:30 Uhr–TBA</span></div>
                 <div class="info"><span class="label">Treffpunkt</span><span class="value">Hotel Garni Gonzaga</span></div>
@@ -808,8 +709,8 @@
                   <h3>Shooting #3 · Passo Pordoi</h3>
                   <div style="color: var(--muted); margin-top: 8px; font-size: .98rem;">📷 Gegenseitig fotografieren</div>
                 </div>
-                <span class="time-pill">12:45</span>
-              </div>
+                <span class="weather-pill">☀️ Sonnig · 16°C</span>
+                </div>
               <div class="grid">
                 <div class="info"><span class="label">Shooting</span><span class="value">13:00 Uhr–TBA</span></div>
                 <div class="info"><span class="label">Koordinaten</span><span class="value">46°29'11.0&quot;N 11°48'56.4&quot;E</span></div>
@@ -833,40 +734,6 @@
   <script>
     const root = document.documentElement;
     const shots = document.querySelectorAll('.shoot');
-
-    const trafficTrack = document.getElementById('trafficTrack');
-    const trafficStatus = document.getElementById('trafficStatus');
-
-    async function loadTraffic() {
-      if (!trafficTrack || !trafficStatus) return;
-
-      try {
-        const feedUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://verkehr.provinz.bz.it/de/rss');
-        const response = await fetch(feedUrl, { cache: 'no-store' });
-        const xmlText = await response.text();
-        const xml = new DOMParser().parseFromString(xmlText, 'text/xml');
-
-        const items = Array.from(xml.querySelectorAll('item')).slice(0, 8);
-
-        if (!items.length) throw new Error('Keine Meldungen');
-
-        const html = items.map((item) => {
-          const title = (item.querySelector('title')?.textContent || 'Verkehrsmeldung').trim();
-          return '<span class="traffic-item"><span class="traffic-dot"></span>' + title + '</span>';
-        }).join('');
-
-        trafficTrack.innerHTML = html + html;
-        trafficStatus.textContent = 'aktualisiert ' + new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
-      } catch (e) {
-        trafficTrack.innerHTML = '<span class="traffic-fallback">Keine aktuellen Verkehrsmeldungen verfügbar</span>';
-        trafficStatus.textContent = 'offline';
-      }
-    }
-
-    loadTraffic();
-    setInterval(loadTraffic, 600000);
-
-    
 
     const revealObserver = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
