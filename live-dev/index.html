@@ -940,15 +940,16 @@
 
     async function fetchWeatherForId(weatherId) {
       if (!weatherId) return null;
-      if (weatherCache[weatherId]) return weatherCache[weatherId];
+      const cached = weatherCache[weatherId];
+      if (cached && Date.now() - cached.timestamp < 5 * 60 * 1000) return cached.data;
       const coords = weatherCoordinates[weatherId];
       if (!coords) return null;
 
       try {
         const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lon}&current=temperature_2m,weather_code,wind_speed_10m,precipitation&timezone=auto`);
         const data = await response.json();
-        weatherCache[weatherId] = data.current || null;
-        return weatherCache[weatherId];
+        weatherCache[weatherId] = { data: data.current || null, timestamp: Date.now() };
+        return weatherCache[weatherId].data;
       } catch {
         return null;
       }
@@ -1143,20 +1144,22 @@
     }
 
     function setActiveDay() {
-      const sections = document.querySelectorAll('.day');
-      const tabItems = document.querySelectorAll('.tab');
+      const sections = Array.from(document.querySelectorAll('.day'));
+      const tabItems = Array.from(document.querySelectorAll('.tab'));
       if (!sections.length || !tabItems.length) return;
+
+      tabItems.forEach(tab => tab.classList.remove('active'));
+
       const marker = Math.min(window.innerHeight * 0.38, 260);
       let activeSection = sections[0];
 
       sections.forEach(section => {
         const rect = section.getBoundingClientRect();
-        if (rect.top <= marker) activeSection = section;
+        if (rect.top <= marker && rect.bottom > 0) activeSection = section;
       });
 
-      tabItems.forEach(tab => {
-        tab.classList.toggle('active', tab.getAttribute('href') === '#' + activeSection.id);
-      });
+      const activeTab = tabItems.find(tab => tab.getAttribute('href') === '#' + activeSection.id);
+      if (activeTab) activeTab.classList.add('active');
     }
 
     function updateScrollProgress() {
@@ -1197,6 +1200,7 @@
 
     async function refreshLiveData({ silent = false } = {}) {
       if (!silent) {
+        liveStatus.hidden = false;
         liveStatus.className = 'live-status';
         liveStatus.textContent = 'Live-Daten werden geladen…';
       }
@@ -1208,7 +1212,7 @@
         renderTimeline(shootings);
         await updateWeatherPills();
         updateSyncStatus();
-        liveStatus.remove();
+        liveStatus.hidden = true;
       } catch (error) {
         liveStatus.className = 'live-status error';
         liveStatus.textContent = 'Fehler beim Laden der Live-Daten: ' + (error.message || error);
@@ -1256,7 +1260,10 @@
 
     setInterval(updateCountdown, 30000);
     setInterval(() => refreshLiveData({ silent: true }), 180000);
-    setInterval(updateWeatherPills, 300000);
+    setInterval(() => {
+      weatherCache = {};
+      updateWeatherPills();
+    }, 300000);
     window.addEventListener('online', () => refreshLiveData({ silent: true }));
   </script>
 </body>
