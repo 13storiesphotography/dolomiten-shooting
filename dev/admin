@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#101010" />
+  <meta name="color-scheme" content="dark" />
+  <title>Admin · Dolomiten Shooting</title>
+  <scr([supabase.com](https://supabase.com/docs/guides/getting-started/api-keys?utm_source=chatgpt.com))et/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --bg: #0f0f0d;
+      --card: rgba(255,255,255,.08);
+      --text: #f7f1e8;
+      --muted: rgba(247,241,232,.66);
+      --line: rgba(247,241,232,.16);
+      --accent: #d8b16a;
+      --danger: #d96c6c;
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: #101010; color: var(--text); font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    body { min-height: 100vh; background: radial-gradient(circle at 20% 0%, rgba(216,177,106,.18), transparent 30%), linear-gradient(180deg, #151411, #090907); }
+    a { color: inherit; }
+
+    .wrap { width: min(1080px, 100%); margin: 0 auto; padding: max(24px, env(safe-area-inset-top)) clamp(16px, 4vw, 34px) 48px; }
+    header { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; margin-bottom: 22px; }
+    .eyebrow { color: var(--accent); letter-spacing: .16em; text-transform: uppercase; font-size: .72rem; font-weight: 900; }
+    h1 { margin: 8px 0 0; font-size: clamp(2.2rem, 8vw, 5rem); line-height: .9; letter-spacing: -.06em; }
+    .status { color: var(--muted); font-size: .9rem; margin-top: 10px; }
+
+    .card { border: 1px solid var(--line); background: rgba(255,255,255,.07); border-radius: var(--radius); padding: 18px; box-shadow: 0 18px 55px rgba(0,0,0,.32); }
+    .login { width: min(460px, 100%); margin-top: 26px; }
+    label { display: block; color: var(--muted); font-size: .76rem; text-transform: uppercase; letter-spacing: .12em; font-weight: 900; margin: 0 0 7px; }
+    input, textarea { width: 100%; min-height: 44px; border: 1px solid var(--line); border-radius: 14px; background: rgba(0,0,0,.22); color: var(--text); padding: 10px 12px; font: inherit; outline: none; }
+    textarea { min-height: 76px; resize: vertical; }
+    input:focus, textarea:focus { border-color: rgba(216,177,106,.55); }
+
+    .grid { display: grid; gap: 12px; }
+    .grid.two { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .grid.three { grid-template-columns: repeat(3, minmax(0,1fr)); }
+    .field { min-width: 0; }
+
+    .btn { min-height: 44px; border: 1px solid var(--line); border-radius: 14px; padding: 0 14px; display: inline-flex; align-items: center; justify-content: center; background: rgba(255,255,255,.07); color: var(--text); font-weight: 900; cursor: pointer; }
+    .btn.primary { background: linear-gradient(135deg, #f0d596, var(--accent)); color: #17130c; border: 0; }
+    .btn.danger { color: #fff; border-color: rgba(217,108,108,.35); background: rgba(217,108,108,.16); }
+    .btnbar { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+
+    .shootings { display: grid; gap: 16px; margin-top: 22px; }
+    details { border: 1px solid var(--line); background: rgba(255,255,255,.055); border-radius: var(--radius); overflow: hidden; }
+    summary { cursor: pointer; padding: 16px 18px; display: flex; justify-content: space-between; gap: 12px; align-items: center; list-style: none; }
+    summary::-webkit-details-marker { display: none; }
+    .summary-main { min-width: 0; }
+    .summary-title { font-weight: 950; font-size: 1.08rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .summary-sub { color: var(--muted); font-size: .9rem; margin-top: 4px; }
+    .summary-day { color: var(--accent); font-weight: 900; white-space: nowrap; }
+    .editor { padding: 0 18px 18px; }
+    .hint { color: var(--muted); font-size: .88rem; line-height: 1.45; }
+    .hidden { display: none !important; }
+
+    @media (max-width: 720px) {
+      header { flex-direction: column; }
+      .grid.two, .grid.three { grid-template-columns: 1fr; }
+      summary { align-items: flex-start; flex-direction: column; }
+      .btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header>
+      <div>
+        <div class="eyebrow">13 Stories Photography</div>
+        <h1>Admin</h1>
+        <div class="status" id="status">Nicht angemeldet</div>
+      </div>
+      <button class="btn danger hidden" id="logoutBtn">Abmelden</button>
+    </header>
+
+    <section class="card login" id="loginBox">
+      <div class="grid">
+        <div class="field">
+          <label for="email">E-Mail</label>
+          <input id="email" type="email" autocomplete="email" placeholder="deine@email.de" />
+        </div>
+        <div class="field">
+          <label for="password">Passwort</label>
+          <input id="password" type="password" autocomplete="current-password" placeholder="Passwort" />
+        </div>
+        <button class="btn primary" id="loginBtn">Einloggen</button>
+        <div class="hint">Nutze den User, den du in Supabase unter Authentication angelegt hast.</div>
+      </div>
+    </section>
+
+    <section id="adminBox" class="hidden">
+      <div class="card">
+        <div class="eyebrow">Live Daten</div>
+        <div class="hint" style="margin-top:8px;">Änderungen werden direkt in Supabase gespeichert. Die öffentliche Timeline kann diese Daten später live laden.</div>
+        <div class="btnbar">
+          <button class="btn primary" id="reloadBtn">Daten neu laden</button>
+        </div>
+      </div>
+      <div class="shootings" id="shootings"></div>
+    </section>
+  </main>
+
+  <script>
+    const SUPABASE_URL = 'https://hidqxungaqlzyzsxjfqb.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_sbU-WVaWQh4x_vC14dnd6w_otutO8f8';
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const statusEl = document.getElementById('status');
+    const loginBox = document.getElementById('loginBox');
+    const adminBox = document.getElementById('adminBox');
+    const shootingsEl = document.getElementById('shootings');
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const reloadBtn = document.getElementById('reloadBtn');
+
+    const fields = [
+      ['sort_order', 'Reihenfolge', 'number'],
+      ['day_label', 'Tag', 'text'],
+      ['date_label', 'Datum', 'text'],
+      ['title', 'Titel', 'text'],
+      ['subtitle', 'Untertitel / Mood', 'text'],
+      ['meeting_time', 'Treffzeit', 'text'],
+      ['meeting_place', 'Treffpunkt', 'text'],
+      ['shooting_time', 'Shootingzeit', 'text'],
+      ['location_name', 'Location', 'text'],
+      ['weather_label', 'Wetter Pill', 'text'],
+      ['route_after', 'Fahrt danach', 'text'],
+      ['meeting_link', 'Treffpunkt Link', 'url'],
+      ['location_link', 'Location Link', 'url'],
+      ['image_url', 'Bild URL', 'url'],
+      ['badges', 'Badges, kommagetrennt', 'textarea']
+    ];
+
+    function setStatus(message) {
+      statusEl.textContent = message;
+    }
+
+    function escapeHtml(value = '') {
+      return String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function valueForInput(row, key) {
+      const value = row[key];
+      if (Array.isArray(value)) return value.join(', ');
+      return value ?? '';
+    }
+
+    async function loadShootings() {
+      setStatus('Daten werden geladen…');
+      const { data, error } = await db.from('shootings').select('*').order('sort_order', { ascending: true });
+
+      if (error) {
+        setStatus('Fehler beim Laden: ' + error.message);
+        return;
+      }
+
+      shootingsEl.innerHTML = data.map(renderEditor).join('');
+      shootingsEl.querySelectorAll('form').forEach((form) => {
+        form.addEventListener('submit', saveForm);
+      });
+      setStatus(data.length + ' Einträge geladen');
+    }
+
+    function renderEditor(row) {
+      const inputs = fields.map(([key, label, type]) => {
+        const value = escapeHtml(valueForInput(row, key));
+        if (type === 'textarea') {
+          return `<div class="field"><label>${label}</label><textarea name="${key}">${value}</textarea></div>`;
+        }
+        return `<div class="field"><label>${label}</label><input name="${key}" type="${type}" value="${value}" /></div>`;
+      }).join('');
+
+      return `
+        <details>
+          <summary>
+            <div class="summary-main">
+              <div class="summary-title">${escapeHtml(row.title)}</div>
+              <div class="summary-sub">${escapeHtml(row.meeting_time || 'TBA')} · ${escapeHtml(row.meeting_place || 'TBA')}</div>
+            </div>
+            <div class="summary-day">${escapeHtml(row.day_label)} · ${escapeHtml(row.date_label)}</div>
+          </summary>
+          <div class="editor">
+            <form data-id="${escapeHtml(row.id)}">
+              <div class="grid two">${inputs}</div>
+              <div class="btnbar">
+                <button class="btn primary" type="submit">Speichern</button>
+              </div>
+            </form>
+          </div>
+        </details>
+      `;
+    }
+
+    async function saveForm(event) {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const id = form.dataset.id;
+      const formData = new FormData(form);
+      const payload = {};
+
+      fields.forEach(([key, , type]) => {
+        const raw = formData.get(key);
+        if (key === 'badges') {
+          payload[key] = String(raw || '').split(',').map(x => x.trim()).filter(Boolean);
+        } else if (key === 'sort_order') {
+          payload[key] = Number(raw || 0);
+        } else {
+          payload[key] = raw || null;
+        }
+      });
+
+      payload.updated_at = new Date().toISOString();
+      setStatus('Speichere ' + id + '…');
+
+      const { error } = await db.from('shootings').update(payload).eq('id', id);
+      if (error) {
+        setStatus('Fehler beim Speichern: ' + error.message);
+        return;
+      }
+
+      setStatus('Gespeichert: ' + id);
+      await loadShootings();
+    }
+
+    loginBtn.addEventListener('click', async () => {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      setStatus('Login läuft…');
+
+      const { error } = await db.auth.signInWithPassword({ email, password });
+      if (error) {
+        setStatus('Login fehlgeschlagen: ' + error.message);
+        return;
+      }
+
+      await boot();
+    });
+
+    logoutBtn.addEventListener('click', async () => {
+      await db.auth.signOut();
+      await boot();
+    });
+
+    reloadBtn.addEventListener('click', loadShootings);
+
+    async function boot() {
+      const { data } = await db.auth.getSession();
+      const session = data.session;
+
+      loginBox.classList.toggle('hidden', !!session);
+      adminBox.classList.toggle('hidden', !session);
+      logoutBtn.classList.toggle('hidden', !session);
+
+      if (!session) {
+        setStatus('Nicht angemeldet');
+        return;
+      }
+
+      setStatus('Angemeldet als ' + session.user.email);
+      await loadShootings();
+    }
+
+    boot();
+  </script>
+</body>
+</html>
