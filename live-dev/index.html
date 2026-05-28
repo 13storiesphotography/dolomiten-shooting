@@ -987,13 +987,23 @@
           </div>
         `;
       }
-      const only = location || meeting;
-      if (!only) return '';
-      return `
-        <div class="actions single">
-          <a class="btn primary" href="${escapeHtml(only)}" target="_blank" rel="noopener">Location öffnen</a>
-        </div>
-      `;
+      if (meeting && !location) {
+        return `
+          <div class="actions single">
+            <a class="btn primary" href="${escapeHtml(meeting)}" target="_blank" rel="noopener">Treffpunkt öffnen</a>
+          </div>
+        `;
+      }
+
+      if (location && !meeting) {
+        return `
+          <div class="actions single">
+            <a class="btn primary" href="${escapeHtml(location)}" target="_blank" rel="noopener">Location öffnen</a>
+          </div>
+        `;
+      }
+
+      return '';
     }
 
     function renderShooting(item, index) {
