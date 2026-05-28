@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#101010" />
   <meta name="color-scheme" content="dark" />
   <title>Admin · Dolomiten Shooting</title>
-  <scr([supabase.com](https://supabase.com/docs/guides/getting-started/api-keys?utm_source=chatgpt.com))et/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
       --bg: #0f0f0d;
@@ -20,48 +20,217 @@
     }
 
     * { box-sizing: border-box; }
-    html, body { margin: 0; background: #101010; color: var(--text); font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-    body { min-height: 100vh; background: radial-gradient(circle at 20% 0%, rgba(216,177,106,.18), transparent 30%), linear-gradient(180deg, #151411, #090907); }
+    html, body {
+      margin: 0;
+      background: #101010;
+      color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 20% 0%, rgba(216,177,106,.18), transparent 30%),
+        linear-gradient(180deg, #151411, #090907);
+    }
+
     a { color: inherit; }
 
-    .wrap { width: min(1080px, 100%); margin: 0 auto; padding: max(24px, env(safe-area-inset-top)) clamp(16px, 4vw, 34px) 48px; }
-    header { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; margin-bottom: 22px; }
-    .eyebrow { color: var(--accent); letter-spacing: .16em; text-transform: uppercase; font-size: .72rem; font-weight: 900; }
-    h1 { margin: 8px 0 0; font-size: clamp(2.2rem, 8vw, 5rem); line-height: .9; letter-spacing: -.06em; }
-    .status { color: var(--muted); font-size: .9rem; margin-top: 10px; }
+    .wrap {
+      width: min(1080px, 100%);
+      margin: 0 auto;
+      padding: max(24px, env(safe-area-inset-top)) clamp(16px, 4vw, 34px) 48px;
+    }
 
-    .card { border: 1px solid var(--line); background: rgba(255,255,255,.07); border-radius: var(--radius); padding: 18px; box-shadow: 0 18px 55px rgba(0,0,0,.32); }
-    .login { width: min(460px, 100%); margin-top: 26px; }
-    label { display: block; color: var(--muted); font-size: .76rem; text-transform: uppercase; letter-spacing: .12em; font-weight: 900; margin: 0 0 7px; }
-    input, textarea { width: 100%; min-height: 44px; border: 1px solid var(--line); border-radius: 14px; background: rgba(0,0,0,.22); color: var(--text); padding: 10px 12px; font: inherit; outline: none; }
-    textarea { min-height: 76px; resize: vertical; }
-    input:focus, textarea:focus { border-color: rgba(216,177,106,.55); }
+    header {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+      margin-bottom: 22px;
+    }
 
-    .grid { display: grid; gap: 12px; }
-    .grid.two { grid-template-columns: repeat(2, minmax(0,1fr)); }
-    .grid.three { grid-template-columns: repeat(3, minmax(0,1fr)); }
+    .eyebrow {
+      color: var(--accent);
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      font-size: .72rem;
+      font-weight: 900;
+    }
+
+    h1 {
+      margin: 8px 0 0;
+      font-size: clamp(2.2rem, 8vw, 5rem);
+      line-height: .9;
+      letter-spacing: -.06em;
+    }
+
+    .status {
+      color: var(--muted);
+      font-size: .9rem;
+      margin-top: 10px;
+      line-height: 1.45;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.07);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: 0 18px 55px rgba(0,0,0,.32);
+    }
+
+    .login {
+      width: min(460px, 100%);
+      margin-top: 26px;
+    }
+
+    label {
+      display: block;
+      color: var(--muted);
+      font-size: .76rem;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      font-weight: 900;
+      margin: 0 0 7px;
+    }
+
+    input, textarea {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(0,0,0,.22);
+      color: var(--text);
+      padding: 10px 12px;
+      font: inherit;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 76px;
+      resize: vertical;
+    }
+
+    input:focus, textarea:focus {
+      border-color: rgba(216,177,106,.55);
+    }
+
+    .grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .grid.two {
+      grid-template-columns: repeat(2, minmax(0,1fr));
+    }
+
     .field { min-width: 0; }
 
-    .btn { min-height: 44px; border: 1px solid var(--line); border-radius: 14px; padding: 0 14px; display: inline-flex; align-items: center; justify-content: center; background: rgba(255,255,255,.07); color: var(--text); font-weight: 900; cursor: pointer; }
-    .btn.primary { background: linear-gradient(135deg, #f0d596, var(--accent)); color: #17130c; border: 0; }
-    .btn.danger { color: #fff; border-color: rgba(217,108,108,.35); background: rgba(217,108,108,.16); }
-    .btnbar { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+    .btn {
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 0 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,.07);
+      color: var(--text);
+      font-weight: 900;
+      cursor: pointer;
+    }
 
-    .shootings { display: grid; gap: 16px; margin-top: 22px; }
-    details { border: 1px solid var(--line); background: rgba(255,255,255,.055); border-radius: var(--radius); overflow: hidden; }
-    summary { cursor: pointer; padding: 16px 18px; display: flex; justify-content: space-between; gap: 12px; align-items: center; list-style: none; }
+    .btn.primary {
+      background: linear-gradient(135deg, #f0d596, var(--accent));
+      color: #17130c;
+      border: 0;
+    }
+
+    .btn.danger {
+      color: #fff;
+      border-color: rgba(217,108,108,.35);
+      background: rgba(217,108,108,.16);
+    }
+
+    .btnbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .shootings {
+      display: grid;
+      gap: 16px;
+      margin-top: 22px;
+    }
+
+    details {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.055);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    summary {
+      cursor: pointer;
+      padding: 16px 18px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      list-style: none;
+    }
+
     summary::-webkit-details-marker { display: none; }
+
     .summary-main { min-width: 0; }
-    .summary-title { font-weight: 950; font-size: 1.08rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .summary-sub { color: var(--muted); font-size: .9rem; margin-top: 4px; }
-    .summary-day { color: var(--accent); font-weight: 900; white-space: nowrap; }
+
+    .summary-title {
+      font-weight: 950;
+      font-size: 1.08rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .summary-sub {
+      color: var(--muted);
+      font-size: .9rem;
+      margin-top: 4px;
+    }
+
+    .summary-day {
+      color: var(--accent);
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
     .editor { padding: 0 18px 18px; }
-    .hint { color: var(--muted); font-size: .88rem; line-height: 1.45; }
+
+    .hint {
+      color: var(--muted);
+      font-size: .88rem;
+      line-height: 1.45;
+    }
+
+    .error-box {
+      border: 1px solid rgba(217,108,108,.35);
+      background: rgba(217,108,108,.12);
+      color: #ffdede;
+      border-radius: 16px;
+      padding: 12px;
+      margin-top: 12px;
+      font-size: .9rem;
+      line-height: 1.45;
+    }
+
     .hidden { display: none !important; }
 
     @media (max-width: 720px) {
       header { flex-direction: column; }
-      .grid.two, .grid.three { grid-template-columns: 1fr; }
+      .grid.two { grid-template-columns: 1fr; }
       summary { align-items: flex-start; flex-direction: column; }
       .btn { width: 100%; }
     }
@@ -73,7 +242,7 @@
       <div>
         <div class="eyebrow">13 Stories Photography</div>
         <h1>Admin</h1>
-        <div class="status" id="status">Nicht angemeldet</div>
+        <div class="status" id="status">Initialisiere…</div>
       </div>
       <button class="btn danger hidden" id="logoutBtn">Abmelden</button>
     </header>
@@ -90,6 +259,7 @@
         </div>
         <button class="btn primary" id="loginBtn">Einloggen</button>
         <div class="hint">Nutze den User, den du in Supabase unter Authentication angelegt hast.</div>
+        <div class="error-box hidden" id="errorBox"></div>
       </div>
     </section>
 
@@ -108,15 +278,17 @@
   <script>
     const SUPABASE_URL = 'https://hidqxungaqlzyzsxjfqb.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_sbU-WVaWQh4x_vC14dnd6w_otutO8f8';
-    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const statusEl = document.getElementById('status');
+    const errorBox = document.getElementById('errorBox');
     const loginBox = document.getElementById('loginBox');
     const adminBox = document.getElementById('adminBox');
     const shootingsEl = document.getElementById('shootings');
     const loginBtn = document.getElementById('loginBtn');
     const logoutBtn = document.getElementById('logoutBtn');
     const reloadBtn = document.getElementById('reloadBtn');
+
+    let db = null;
 
     const fields = [
       ['sort_order', 'Reihenfolge', 'number'],
@@ -128,6 +300,7 @@
       ['meeting_place', 'Treffpunkt', 'text'],
       ['shooting_time', 'Shootingzeit', 'text'],
       ['location_name', 'Location', 'text'],
+      ['weather_id', 'Wetter ID', 'text'],
       ['weather_label', 'Wetter Pill', 'text'],
       ['route_after', 'Fahrt danach', 'text'],
       ['meeting_link', 'Treffpunkt Link', 'url'],
@@ -138,6 +311,43 @@
 
     function setStatus(message) {
       statusEl.textContent = message;
+    }
+
+    function showError(message) {
+      errorBox.textContent = message;
+      errorBox.classList.remove('hidden');
+    }
+
+    function clearError() {
+      errorBox.textContent = '';
+      errorBox.classList.add('hidden');
+    }
+
+    function runSelfTests() {
+      const tests = [
+        {
+          name: 'Supabase SDK geladen',
+          pass: !!window.supabase && typeof window.supabase.createClient === 'function'
+        },
+        {
+          name: 'Supabase URL gesetzt',
+          pass: /^https:\/\/.+\.supabase\.co$/.test(SUPABASE_URL)
+        },
+        {
+          name: 'Publishable Key gesetzt',
+          pass: SUPABASE_KEY.startsWith('sb_publishable_') || SUPABASE_KEY.startsWith('eyJ')
+        }
+      ];
+
+      const failed = tests.filter(test => !test.pass);
+      if (failed.length) {
+        throw new Error('Admin Selbsttest fehlgeschlagen: ' + failed.map(test => test.name).join(', '));
+      }
+    }
+
+    function initSupabase() {
+      runSelfTests();
+      db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     }
 
     function escapeHtml(value = '') {
@@ -156,19 +366,26 @@
     }
 
     async function loadShootings() {
+      clearError();
       setStatus('Daten werden geladen…');
-      const { data, error } = await db.from('shootings').select('*').order('sort_order', { ascending: true });
+
+      const { data, error } = await db
+        .from('shootings')
+        .select('*')
+        .order('sort_order', { ascending: true });
 
       if (error) {
-        setStatus('Fehler beim Laden: ' + error.message);
+        setStatus('Fehler beim Laden');
+        showError('Fehler beim Laden: ' + error.message);
         return;
       }
 
-      shootingsEl.innerHTML = data.map(renderEditor).join('');
+      shootingsEl.innerHTML = (data || []).map(renderEditor).join('');
       shootingsEl.querySelectorAll('form').forEach((form) => {
         form.addEventListener('submit', saveForm);
       });
-      setStatus(data.length + ' Einträge geladen');
+
+      setStatus((data || []).length + ' Einträge geladen');
     }
 
     function renderEditor(row) {
@@ -203,12 +420,14 @@
 
     async function saveForm(event) {
       event.preventDefault();
+      clearError();
+
       const form = event.currentTarget;
       const id = form.dataset.id;
       const formData = new FormData(form);
       const payload = {};
 
-      fields.forEach(([key, , type]) => {
+      fields.forEach(([key]) => {
         const raw = formData.get(key);
         if (key === 'badges') {
           payload[key] = String(raw || '').split(',').map(x => x.trim()).filter(Boolean);
@@ -224,7 +443,8 @@
 
       const { error } = await db.from('shootings').update(payload).eq('id', id);
       if (error) {
-        setStatus('Fehler beim Speichern: ' + error.message);
+        setStatus('Fehler beim Speichern');
+        showError('Fehler beim Speichern: ' + error.message);
         return;
       }
 
@@ -233,13 +453,24 @@
     }
 
     loginBtn.addEventListener('click', async () => {
+      clearError();
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
+
+      if (!email || !password) {
+        showError('Bitte E-Mail und Passwort eingeben.');
+        return;
+      }
+
       setStatus('Login läuft…');
+      loginBtn.disabled = true;
 
       const { error } = await db.auth.signInWithPassword({ email, password });
+      loginBtn.disabled = false;
+
       if (error) {
-        setStatus('Login fehlgeschlagen: ' + error.message);
+        setStatus('Login fehlgeschlagen');
+        showError('Login fehlgeschlagen: ' + error.message);
         return;
       }
 
@@ -254,9 +485,16 @@
     reloadBtn.addEventListener('click', loadShootings);
 
     async function boot() {
-      const { data } = await db.auth.getSession();
-      const session = data.session;
+      clearError();
+      const { data, error } = await db.auth.getSession();
 
+      if (error) {
+        setStatus('Session Fehler');
+        showError('Session Fehler: ' + error.message);
+        return;
+      }
+
+      const session = data.session;
       loginBox.classList.toggle('hidden', !!session);
       adminBox.classList.toggle('hidden', !session);
       logoutBtn.classList.toggle('hidden', !session);
@@ -270,7 +508,14 @@
       await loadShootings();
     }
 
-    boot();
+    try {
+      initSupabase();
+      boot();
+    } catch (error) {
+      setStatus('Admin konnte nicht starten');
+      showError(error.message + ' · Prüfe, ob der Supabase Script-Tag korrekt geladen wird.');
+      console.error(error);
+    }
   </script>
 </body>
 </html>
