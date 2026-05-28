@@ -40,11 +40,11 @@
     body::before {
       content: "";
       position: fixed;
-      top: 0;
+      top: env(safe-area-inset-top, 0px);
       left: 0;
       right: 0;
       height: 3px;
-      z-index: 999;
+      z-index: 9999;
       background: linear-gradient(90deg, var(--accent), var(--accent2));
       transform-origin: left;
       transform: scaleX(var(--scroll-progress, 0));
@@ -78,13 +78,14 @@
 
     .hero {
       --hero-shift: 0px;
+      --app-safe-top: env(safe-area-inset-top, 0px);
       box-shadow: 0 -120px 0 120px #101010;
       width: 100vw;
       min-height: clamp(320px, 42vh, 460px);
       animation: heroIn .9s ease-out both;
       display: grid;
       align-items: end;
-      padding: max(44px, env(safe-area-inset-top)) max(clamp(16px, 4vw, 36px), calc((100vw - 1120px) / 2 + 36px)) 28px;
+      padding: max(58px, calc(var(--app-safe-top) + 34px)) max(clamp(16px, 4vw, 36px), calc((100vw - 1120px) / 2 + 36px)) 28px;
       margin: 0 calc(50% - 50vw) 18px;
       overflow: hidden;
       position: relative;
@@ -297,8 +298,8 @@
     }
 
     .topbar {
-      position: sticky;
-      top: 0;
+      position: relative;
+      top: auto;
       z-index: 50;
       overflow-x: auto;
       margin: 0 calc(clamp(16px, 4vw, 36px) * -1) 24px;
@@ -315,10 +316,22 @@
     .topbar::-webkit-scrollbar { display: none; }
 
     .topbar.is-sticky {
+      position: fixed;
+      top: env(safe-area-inset-top, 0px);
+      left: 0;
+      right: 0;
+      margin: 0;
+      padding-left: max(13px, env(safe-area-inset-left, 0px));
+      padding-right: max(13px, env(safe-area-inset-right, 0px));
       background: rgba(15,15,13,.72);
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
       border-bottom-color: rgba(247,241,232,.08);
+      box-shadow: 0 12px 30px rgba(0,0,0,.18);
+    }
+
+    .topbar.is-sticky + .day {
+      margin-top: 96px;
     }
 
     .tabs {
@@ -614,6 +627,26 @@
       grid-template-columns: repeat(2, minmax(0,1fr));
       gap: 10px;
       margin-top: 16px;
+    }
+
+    .light-window {
+      margin-top: 14px;
+      border: 1px solid rgba(216,177,106,.24);
+      background: rgba(216,177,106,.09);
+      border-radius: 18px;
+      padding: 13px;
+    }
+
+    .light-window strong {
+      display: block;
+      font-size: 1rem;
+      margin-bottom: 4px;
+    }
+
+    .light-window span {
+      color: var(--muted);
+      font-size: .9rem;
+      line-height: 1.35;
     }
 
     .grid {
@@ -995,6 +1028,10 @@
         <div class="info"><span class="label">Wind</span><span class="value" id="weatherWind">–</span></div>
         <div class="info"><span class="label">Regen</span><span class="value" id="weatherRain">–</span></div>
       </div>
+      <div class="light-window">
+        <strong id="weatherLightTitle">✨ Beste Lichtstimmung</strong>
+        <span id="weatherLightText">Zeitfenster wird geladen…</span>
+      </div>
       
     </div>
   </div>
@@ -1022,6 +1059,8 @@
     const weatherCondition = document.getElementById('weatherCondition');
     const weatherWind = document.getElementById('weatherWind');
     const weatherRain = document.getElementById('weatherRain');
+    const weatherLightTitle = document.getElementById('weatherLightTitle');
+    const weatherLightText = document.getElementById('weatherLightText');
     const weatherClose = document.getElementById('weatherClose');
     const syncStatus = document.getElementById('syncStatus');
 
@@ -1163,7 +1202,7 @@ function setActiveDay() {
           revealObserver.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.16 });
+    }, { threshold: 0.04, rootMargin: '160px 0px 120px 0px' });
 
     shots.forEach((shot, index) => {
       shot.style.transitionDelay = `${Math.min(index * 70, 280)}ms`;
@@ -1203,13 +1242,33 @@ function setActiveDay() {
     }
 
     window.addEventListener('load', () => {
-      window.scrollTo(0, 0);
+      requestAnimationFrame(() => {
+        window.scrollTo(0, 0);
+        setActiveDay();
+        updateScrollProgress();
+        updateStickyState();
+      });
     });
 
+    setTimeout(() => {
+      setActiveDay();
+      updateScrollProgress();
+      updateStickyState();
+    }, 300);
+
     const weatherMap = {
-      '🌅 9°': { title: 'Seiser-Alm-Panorama', temp: '9°', condition: 'Klarer Morgen', wind: '6 km/h', rain: '0 mm', lat: 46.555, lon: 11.709 },
-      '☀️ 16°': { title: 'Langental / Passo Pordoi', temp: '16°', condition: 'Sonnig', wind: '8 km/h', rain: '0 mm', lat: 46.55, lon: 11.77 },
-      '🌤️ 14°': { title: 'Val di Funes / Lago Pian Da Mur', temp: '14°', condition: 'Leicht bewölkt', wind: '5 km/h', rain: '0 mm', lat: 46.64, lon: 11.72 }
+      '🌅 9°': {
+        title: 'Seiser-Alm-Panorama', temp: '9°', condition: 'Klarer Morgen', wind: '6 km/h', rain: '0 mm', lat: 46.555, lon: 11.709,
+        lightTitle: '✨ Beste Lichtstimmung', lightText: '06:45–07:45 · weiches Morgenlicht über der Alm'
+      },
+      '☀️ 16°': {
+        title: 'Langental / Passo Pordoi', temp: '16°', condition: 'Sonnig', wind: '8 km/h', rain: '0 mm', lat: 46.55, lon: 11.77,
+        lightTitle: '✨ Beste Lichtstimmung', lightText: '12:30–13:30 · helles, klares Tageslicht'
+      },
+      '🌤️ 14°': {
+        title: 'Val di Funes / Lago Pian Da Mur', temp: '14°', condition: 'Leicht bewölkt', wind: '5 km/h', rain: '0 mm', lat: 46.64, lon: 11.72,
+        lightTitle: '✨ Beste Lichtstimmung', lightText: '10:30–11:15 · ruhiges Licht mit weichen Schatten'
+      }
     };
 
     document.querySelectorAll('.weather-pill').forEach((pill) => {
@@ -1232,12 +1291,16 @@ function setActiveDay() {
 
         weatherTitle.textContent = weather.title;
         weatherSummary.textContent = liveWeather
-          ? 'Live aktualisiert · ideale Shooting-Bedingungen prüfen ✨'
+          ? 'Live aktualisiert · Wetter am Spot'
           : 'Offline-Vorschau';
         weatherTemp.textContent = weather.temp;
         weatherCondition.textContent = weather.condition;
         weatherWind.textContent = weather.wind;
         weatherRain.textContent = weather.rain;
+        if (weatherLightTitle && weatherLightText) {
+          weatherLightTitle.textContent = weather.lightTitle || '✨ Beste Lichtstimmung';
+          weatherLightText.textContent = weather.lightText || 'Zeitfenster folgt, sobald genug Daten vorhanden sind.';
+        }
 
         weatherModal.classList.add('open');
       });
