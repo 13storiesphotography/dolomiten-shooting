@@ -984,6 +984,22 @@
     const weatherClose = document.getElementById('weatherClose');
     const syncStatus = document.getElementById('syncStatus');
 
+    async function cleanupOldOfflineCache() {
+      try {
+        if ('serviceWorker' in navigator) {
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          await Promise.all(registrations.map((registration) => registration.unregister()));
+        }
+
+        if ('caches' in window) {
+          const cacheNames = await caches.keys();
+          await Promise.all(cacheNames.map((cacheName) => caches.delete(cacheName)));
+        }
+      } catch (error) {}
+    }
+
+    cleanupOldOfflineCache();
+
     const scheduleItems = [
       { title: 'Val di Funes', timeLabel: 'Zeit offen', meeting: null, meetingTime: 'TBA', shootingTime: 'TBA', spot: 'Val di Funes', meetingPlace: 'TBA', meetingRoute: 'https://maps.app.goo.gl/CzT5NBFWz6P5zAxU6', shootingRoute: 'https://maps.app.goo.gl/CzT5NBFWz6P5zAxU6' },
       { title: 'Seiser-Alm-Panorama', timeLabel: '06:00 Uhr Treffpunkt · 06:30 Uhr Shooting', meeting: '2026-05-30T06:00:00', meetingTime: '06:00 Uhr', shootingTime: '06:30 Uhr', spot: 'Parkplatz P4', meetingPlace: 'Parkplatz P4', meetingRoute: 'https://maps.app.goo.gl/eznsJcteWourmMaMA', shootingRoute: 'https://maps.app.goo.gl/3ENp89cx95QsnvAH6' },
