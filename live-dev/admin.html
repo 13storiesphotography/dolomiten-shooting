@@ -33,10 +33,9 @@
     .login { width: min(460px, 100%); margin-top: 26px; }
 
     label { display: block; color: var(--muted); font-size: .72rem; text-transform: uppercase; letter-spacing: .12em; font-weight: 900; margin: 0 0 7px; }
-    input, textarea, select { width: 100%; min-height: 44px; border: 1px solid var(--line); border-radius: 14px; background: rgba(0,0,0,.22); color: var(--text); padding: 10px 12px; font: inherit; outline: none; }
+    input, textarea { width: 100%; min-height: 44px; border: 1px solid var(--line); border-radius: 14px; background: rgba(0,0,0,.22); color: var(--text); padding: 10px 12px; font: inherit; outline: none; }
     textarea { min-height: 76px; resize: vertical; }
-    input:focus, textarea:focus, select:focus { border-color: rgba(216,177,106,.55); }
-    select option { background: #171715; color: var(--text); }
+    input:focus, textarea:focus { border-color: rgba(216,177,106,.55); }
 
     .grid { display: grid; gap: 12px; }
     .grid.two { grid-template-columns: repeat(2, minmax(0,1fr)); }
@@ -94,7 +93,7 @@
     <section id="adminBox" class="hidden">
       <div class="card">
         <div class="eyebrow">Live Daten</div>
-        <div class="hint" style="margin-top:8px;">Wetter wird automatisch aus dem Wetter-Ort berechnet. Das Feld „Wetter Pill“ musst du nicht mehr pflegen.</div>
+        <div class="hint" style="margin-top:8px;">Wetter wird automatisch aus Titel, Treffpunkt oder Location erkannt. Du musst keine Wetterdaten pflegen.</div>
         <div class="btnbar"><button class="btn primary" id="reloadBtn">Daten neu laden</button></div>
       </div>
       <div class="shootings" id="shootings"></div>
@@ -115,15 +114,7 @@
     const reloadBtn = document.getElementById('reloadBtn');
 
     let db = null;
-
-    const weatherOptions = [
-      ['val-di-funes', 'Val di Funes'],
-      ['seiser-alm', 'Seiser Alm'],
-      ['langental', 'Langental'],
-      ['groedner-joch', 'Grödner Joch'],
-      ['lago-pian', 'Lago Pian Da Mur'],
-      ['passo-pordoi', 'Passo Pordoi']
-    ];
+    let currentRowsById = {};
 
     const simpleFields = [
       ['sort_order', 'Reihenfolge', 'number'],
@@ -142,8 +133,7 @@
 
     const placeFields = [
       ['meeting_place', 'Treffpunkt', 'text'],
-      ['location_name', 'Location', 'text'],
-      ['weather_id', 'Wetter-Ort', 'select']
+      ['location_name', 'Location', 'text']
     ];
 
     const linkFields = [
@@ -191,10 +181,6 @@
     function renderField(row, [key, label, type]) {
       const value = escapeHtml(valueForInput(row, key));
       if (type === 'textarea') return `<div class="field"><label>${label}</label><textarea name="${key}">${value}</textarea></div>`;
-      if (type === 'select') {
-        const options = weatherOptions.map(([id, name]) => `<option value="${escapeHtml(id)}" ${row[key] === id ? 'selected' : ''}>${escapeHtml(name)}</option>`).join('');
-        return `<div class="field"><label>${label}</label><select name="${key}">${options}</select></div>`;
-      }
       return `<div class="field"><label>${label}</label><input name="${key}" type="${type}" value="${value}" /></div>`;
     }
 
@@ -202,13 +188,23 @@
       return `<div class="section-title">${title}</div><div class="grid ${columns}">${fields.map(field => renderField(row, field)).join('')}</div>`;
     }
 
+    function fillFormFromRow(form, row) {
+      allEditableKeys.forEach(key => {
+        const field = form.elements[key];
+        if (!field) return;
+        field.value = valueForInput(row, key);
+      });
+    }
+
     async function loadShootings() {
       clearError();
       setStatus('Daten werden geladen…');
       const { data, error } = await db.from('shootings').select('*').order('sort_order', { ascending: true });
       if (error) { setStatus('Fehler beim Laden'); showError('Fehler beim Laden: ' + formatSupabaseError(error)); return; }
+      currentRowsById = Object.fromEntries((data || []).map(row => [row.id, row]));
       shootingsEl.innerHTML = (data || []).map(renderEditor).join('');
       shootingsEl.querySelectorAll('form').forEach(form => form.addEventListener('submit', saveForm));
+      shootingsEl.querySelectorAll('[data-cancel]').forEach(button => button.addEventListener('click', cancelForm));
       setStatus((data || []).length + ' Einträge geladen');
     }
 
@@ -226,13 +222,26 @@
             <form data-id="${escapeHtml(row.id)}">
               ${renderGroup('Basis', row, simpleFields, 'two')}
               ${renderGroup('Zeiten', row, timeFields, 'three')}
-              ${renderGroup('Orte & Wetter', row, placeFields, 'three')}
+              ${renderGroup('Orte', row, placeFields, 'two')}
               ${renderGroup('Links & Bild', row, linkFields, 'two')}
-              <div class="btnbar"><button class="btn primary" type="submit">Speichern</button></div>
+              <div class="btnbar">
+                <button class="btn primary" type="submit">Speichern</button>
+                <button class="btn" type="button" data-cancel="${escapeHtml(row.id)}">Abbrechen</button>
+              </div>
             </form>
           </div>
         </details>
       `;
+    }
+
+    function cancelForm(event) {
+      const id = event.currentTarget.dataset.cancel;
+      const form = event.currentTarget.closest('form');
+      const row = currentRowsById[id];
+      if (!form || !row) return;
+      fillFormFromRow(form, row);
+      form.closest('details').open = false;
+      setStatus('Änderungen verworfen: ' + id);
     }
 
     async function saveForm(event) {
@@ -250,6 +259,8 @@
         else payload[key] = raw || null;
       });
 
+      payload.weather_label = null;
+      payload.weather_id = null;
       payload.updated_at = new Date().toISOString();
       setStatus('Speichere ' + id + '…');
       const { error } = await db.from('shootings').update(payload).eq('id', id);
