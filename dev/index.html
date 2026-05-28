@@ -8,7 +8,6 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="Dolomiten Shooting" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="manifest.json" />
   <title>Dolomiten Shooting</title>
   <style>
     :root {
@@ -1035,14 +1034,7 @@
 
     updateCountdown();
     setInterval(updateCountdown, 30000);
-
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js').catch(() => {});
-      });
-    }
-
-    function setActiveDay() {
+function setActiveDay() {
       if (!sections.length || !tabs.length) return;
       const marker = Math.min(window.innerHeight * 0.38, 260);
       let activeSection = sections[0];
@@ -1140,39 +1132,16 @@
         weatherModal.classList.remove('open');
       }
     });
-
-    const AUTO_REFRESH_MINUTES = 10;
-    let lastAutoRefreshCheck = Date.now();
-
     function updateSyncStatus() {
       if (!syncStatus) return;
-      if (navigator.onLine) {
-        syncStatus.textContent = 'Online · automatische Aktualisierung alle ' + AUTO_REFRESH_MINUTES + ' Min.';
-      } else {
-        syncStatus.textContent = 'Offline · vorhandene Version bleibt verfügbar';
-      }
-    }
-
-    function shouldAutoRefresh() {
-      const weatherOpen = weatherModal?.classList.contains('open');
-      return navigator.onLine && !document.hidden && !weatherOpen;
-    }
-
-    function checkAutoRefresh() {
-      updateSyncStatus();
-      const elapsed = Date.now() - lastAutoRefreshCheck;
-      if (elapsed < AUTO_REFRESH_MINUTES * 60 * 1000) return;
-      lastAutoRefreshCheck = Date.now();
-      if (shouldAutoRefresh()) {
-        window.location.reload();
-      }
+      syncStatus.textContent = navigator.onLine
+        ? 'Online · manuell neu laden für aktuelle Version'
+        : 'Offline · vorhandene Version bleibt verfügbar';
     }
 
     updateSyncStatus();
     window.addEventListener('online', updateSyncStatus);
     window.addEventListener('offline', updateSyncStatus);
-    document.addEventListener('visibilitychange', updateSyncStatus);
-    setInterval(checkAutoRefresh, 60 * 1000);
   </script>
 </body>
 </html>
