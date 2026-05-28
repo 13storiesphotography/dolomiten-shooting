@@ -52,16 +52,16 @@
     .app {
       width: min(1120px, 100%);
       margin: 0 auto;
-      padding: max(20px, env(safe-area-inset-top)) clamp(16px, 4vw, 36px) 56px;
+      padding: 0 clamp(16px, 4vw, 36px) 56px;
     }
 
     .hero {
-      min-height: clamp(300px, 38vh, 420px);
+      min-height: clamp(320px, 42vh, 460px);
       animation: heroIn .9s ease-out both;
       display: grid;
       align-items: end;
-      padding: 22px 0 18px;
-      margin: 0 0 18px;
+      padding: max(44px, env(safe-area-inset-top)) clamp(16px, 4vw, 36px) 28px;
+      margin: 0 calc(clamp(16px, 4vw, 36px) * -1) 18px;
       overflow: hidden;
       position: relative;
       background:
@@ -112,17 +112,10 @@
     }
 
     .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      margin: 0 calc(clamp(16px, 4vw, 36px) * -1) 26px;
-      padding: 10px clamp(16px, 4vw, 36px);
-      backdrop-filter: blur(22px);
-      -webkit-backdrop-filter: blur(22px);
-      background: rgba(15,15,13,.72);
-      border-bottom: 1px solid var(--line);
       overflow-x: auto;
+      margin: 0 0 24px;
       scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
     }
     .topbar::-webkit-scrollbar { display: none; }
 
@@ -134,16 +127,17 @@
 
     .tab {
       padding: 10px 14px;
-      transition: transform .25s ease, background .25s ease, color .25s ease, border-color .25s ease;
-      border: 1px solid var(--line);
       border-radius: 999px;
-      color: var(--muted);
+      border: 1px solid var(--line);
       background: rgba(255,255,255,.05);
-      font-size: .92rem;
+      color: var(--muted);
+      font-size: .95rem;
       white-space: nowrap;
+      transition: transform .25s ease, background .25s ease, color .25s ease, border-color .25s ease;
     }
 
     .tab strong { color: var(--text); }
+
     .tab:hover {
       transform: translateY(-1px);
       color: var(--text);
@@ -155,11 +149,95 @@
       border: 1px solid rgba(216,177,106,.28);
       background: rgba(216,177,106,.10);
       border-radius: 20px;
-      padding: 14px 16px;
+      padding: 18px;
       color: rgba(247,241,232,.82);
       margin: 0 0 28px;
       line-height: 1.45;
       font-size: .95rem;
+    } {
+      border: 1px solid rgba(216,177,106,.22);
+      background: linear-gradient(135deg, rgba(216,177,106,.10), rgba(255,255,255,.035));
+      border-radius: 20px;
+      padding: 0;
+      color: rgba(247,241,232,.82);
+      margin: 0 0 28px;
+      line-height: 1.45;
+      font-size: .95rem;
+      overflow: hidden;
+    }
+
+    .traffic-box {
+      display: grid;
+      gap: 10px;
+      padding: 14px 16px;
+    }
+
+    .traffic-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--accent);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      font-size: .72rem;
+      font-weight: 900;
+    }
+
+    .traffic-status {
+      color: var(--muted);
+      letter-spacing: 0;
+      text-transform: none;
+      font-size: .78rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .traffic-ticker {
+      position: relative;
+      overflow: hidden;
+      min-height: 28px;
+      mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+    }
+
+    .traffic-track {
+      display: inline-flex;
+      gap: 28px;
+      min-width: max-content;
+      white-space: nowrap;
+      animation: tickerMove 42s linear infinite;
+      will-change: transform;
+    }
+
+    .traffic-ticker:hover .traffic-track {
+      animation-play-state: paused;
+    }
+
+    .traffic-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: rgba(247,241,232,.88);
+    }
+
+    .traffic-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 14px rgba(216,177,106,.55);
+      flex: 0 0 auto;
+    }
+
+    .traffic-fallback {
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    @keyframes tickerMove {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
     }
 
     .day {
@@ -339,18 +417,18 @@
       line-height: 1.02;
     }
 
-    .status {
+    .time-pill {
       flex: 0 0 auto;
       color: #1b1710;
-      background: var(--accent2);
+      background: linear-gradient(135deg, #f0d596, var(--accent));
       border-radius: 999px;
-      padding: 8px 10px;
-      font-size: .78rem;
+      padding: 8px 11px;
+      font-size: .8rem;
       font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: .07em;
+      letter-spacing: .03em;
+      box-shadow: 0 10px 24px rgba(216,177,106,.14);
+      white-space: nowrap;
     }
-    .status.open { background: var(--danger); color: #fff; }
 
     .grid {
       display: grid;
@@ -474,7 +552,7 @@
 
     @media (max-width: 430px) {
       .app { padding-left: 13px; padding-right: 13px; }
-      .hero { min-height: 360px; border-radius: 26px; }
+      .hero { min-height: 340px; margin-left: -13px; margin-right: -13px; padding-left: 18px; padding-right: 18px; }
       .grid, .actions { grid-template-columns: 1fr; }
       .day-head { align-items: flex-start; flex-direction: column; }
       .day-meta { text-align: left; }
@@ -519,7 +597,19 @@
       </div>
     </nav>
 
-    <div class="notice"></div>
+    <div class="notice" aria-live="polite">
+      <div class="traffic-box">
+        <div class="traffic-head">
+          <span>Aktuelle Verkehrslage</span>
+          <span class="traffic-status" id="trafficStatus">lädt…</span>
+        </div>
+        <div class="traffic-ticker">
+          <div class="traffic-track" id="trafficTrack">
+            <span class="traffic-fallback">Verkehrsmeldungen werden geladen…</span>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <section class="day" id="fr">
       <div class="day-head">
@@ -540,13 +630,13 @@
             <div class="content">
               <div class="title-row">
                 <h3>Shooting „Val di Funes“</h3>
-                <span class="status open">TBA</span>
+                <span class="time-pill">Zeit offen</span>
               </div>
               <div class="grid">
                 <div class="info"><span class="label">Shooting</span><span class="value">TBA</span></div>
                 <div class="info"><span class="label">Treffpunkt</span><span class="value">TBA</span></div>
                 <div class="info"><span class="label">Uhrzeit</span><span class="value">TBA</span></div>
-                <div class="info"><span class="label">Status</span><span class="value">Flexibel</span></div>
+                <div class="info"><span class="label">Planung</span><span class="value">flexibel</span></div>
               </div>
               <div class="actions">
                 <a class="btn primary" href="https://maps.app.goo.gl/CzT5NBFWz6P5zAxU6" target="_blank" rel="noopener">Location öffnen</a>
@@ -580,7 +670,7 @@
                   <h3>Shooting #1 · Seiser-Alm-Panorama</h3>
                   <div style="color: var(--muted); margin-top: 8px; font-size: .98rem;">🧺 Picknick im Sonnenaufgang</div>
                 </div>
-                <span class="status">Fix</span>
+                <span class="time-pill">06:00</span>
               </div>
               <div class="grid">
                 <div class="info"><span class="label">Shooting</span><span class="value">06:30–09:00 Uhr</span></div>
@@ -611,7 +701,7 @@
                   <h3>Shooting #2 · Langental</h3>
                   <div style="color: var(--muted); margin-top: 8px; font-size: .98rem;">🎨 Mal-Date</div>
                 </div>
-                <span class="status">Fix</span>
+                <span class="time-pill">12:00</span>
               </div>
               <div class="grid">
                 <div class="info"><span class="label">Shooting</span><span class="value">12:30–14:00 Uhr</span></div>
@@ -651,7 +741,7 @@
                   <h3>Shooting #1 · Grödner Joch</h3>
                   <div style="color: var(--muted); margin-top: 8px; font-size: .98rem;">🎸 Ausblick genießen & Gitarre spielen</div>
                 </div>
-                <span class="status open">Ende TBA</span>
+                <span class="time-pill">06:30</span>
               </div>
               <div class="grid">
                 <div class="info"><span class="label">Shooting</span><span class="value">07:00 Uhr–TBA</span></div>
@@ -682,13 +772,13 @@
                   <h3>Shooting #2 · Lago Pian Da Mur</h3>
                   <div style="color: var(--muted); margin-top: 8px; font-size: .98rem;">🚶 Schöner Spaziergang</div>
                 </div>
-                <span class="status open">Ende TBA</span>
+                <span class="time-pill">10:00</span>
               </div>
               <div class="grid">
                 <div class="info"><span class="label">Shooting</span><span class="value">10:30 Uhr–TBA</span></div>
                 <div class="info"><span class="label">Treffpunkt</span><span class="value">Hotel Garni Gonzaga</span></div>
                 <div class="info"><span class="label">Meeting</span><span class="value">10:00 Uhr</span></div>
-                <div class="info"><span class="label">Status</span><span class="value">Fix + offen</span></div>
+                <div class="info"><span class="label">Puffer</span><span class="value">Ende offen</span></div>
               </div>
               <div class="actions">
                 <a class="btn primary" href="https://maps.app.goo.gl/a29SA2koVQ9Af7fz8" target="_blank" rel="noopener">Location öffnen</a>
@@ -713,7 +803,7 @@
                   <h3>Shooting #3 · Passo Pordoi</h3>
                   <div style="color: var(--muted); margin-top: 8px; font-size: .98rem;">📷 Gegenseitig fotografieren</div>
                 </div>
-                <span class="status open">Ende TBA</span>
+                <span class="time-pill">12:45</span>
               </div>
               <div class="grid">
                 <div class="info"><span class="label">Shooting</span><span class="value">13:00 Uhr–TBA</span></div>
@@ -738,6 +828,40 @@
   <script>
     const root = document.documentElement;
     const shots = document.querySelectorAll('.shoot');
+
+    const trafficTrack = document.getElementById('trafficTrack');
+    const trafficStatus = document.getElementById('trafficStatus');
+
+    async function loadTraffic() {
+      if (!trafficTrack || !trafficStatus) return;
+
+      try {
+        const feedUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://verkehr.provinz.bz.it/de/rss');
+        const response = await fetch(feedUrl, { cache: 'no-store' });
+        const xmlText = await response.text();
+        const xml = new DOMParser().parseFromString(xmlText, 'text/xml');
+
+        const items = Array.from(xml.querySelectorAll('item')).slice(0, 8);
+
+        if (!items.length) throw new Error('Keine Meldungen');
+
+        const html = items.map((item) => {
+          const title = (item.querySelector('title')?.textContent || 'Verkehrsmeldung').trim();
+          return '<span class="traffic-item"><span class="traffic-dot"></span>' + title + '</span>';
+        }).join('');
+
+        trafficTrack.innerHTML = html + html;
+        trafficStatus.textContent = 'aktualisiert ' + new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+      } catch (e) {
+        trafficTrack.innerHTML = '<span class="traffic-fallback">Keine aktuellen Verkehrsmeldungen verfügbar</span>';
+        trafficStatus.textContent = 'offline';
+      }
+    }
+
+    loadTraffic();
+    setInterval(loadTraffic, 600000);
+
+    
 
     const revealObserver = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
