@@ -76,12 +76,13 @@
     .hero {
       --hero-shift: 0px;
       box-shadow: 0 -120px 0 120px #101010;
+      width: 100vw;
       min-height: clamp(320px, 42vh, 460px);
       animation: heroIn .9s ease-out both;
       display: grid;
       align-items: end;
-      padding: max(44px, env(safe-area-inset-top)) clamp(16px, 4vw, 36px) 28px;
-      margin: 0 calc(clamp(16px, 4vw, 36px) * -1) 18px;
+      padding: max(44px, env(safe-area-inset-top)) max(clamp(16px, 4vw, 36px), calc((100vw - 1120px) / 2 + 36px)) 28px;
+      margin: 0 calc(50% - 50vw) 18px;
       overflow: hidden;
       position: relative;
       background:
@@ -106,13 +107,12 @@
       position: relative;
       z-index: 1;
       width: 100%;
-      max-width: 1120px;
+      max-width: 1040px;
       margin: 0 auto;
       padding: 0;
       display: flex;
       flex-direction: column;
       align-items: flex-start;
-      --hero-align: -6px;
     }
 
     .eyebrow {
@@ -123,17 +123,14 @@
       font-weight: 700;
       margin: 0 0 12px;
       width: fit-content;
-      transform: translateX(0px);
-      padding-left: 6px;
     }
 
     h1 {
       margin: 0;
-      font-size: clamp(3rem, 13vw, 7.4rem);
-      line-height: .86;
-      letter-spacing: -.08em;
+      font-size: clamp(3rem, 10vw, 6.4rem);
+      line-height: .9;
+      letter-spacing: -.055em;
       max-width: 980px;
-      transform: translateX(var(--hero-align));
     }
 
     .hero p {
@@ -142,8 +139,6 @@
       line-height: 1.55;
       max-width: 940px;
       margin: 16px 0 0;
-      transform: translateX(0px);
-      padding-left: 6px;
     }
 
     .next-panel {
@@ -676,7 +671,7 @@
       }
 
       .app { padding-left: 13px; padding-right: 13px; }
-      .hero { min-height: 340px; margin-left: -13px; margin-right: -13px; padding-left: 18px; padding-right: 18px; }
+      .hero { min-height: 340px; margin-left: calc(50% - 50vw); margin-right: calc(50% - 50vw); padding-left: 18px; padding-right: 18px; }
       .grid, .actions { grid-template-columns: 1fr; }
       .day-head { align-items: flex-start; flex-direction: column; }
       .day-meta { text-align: left; }
